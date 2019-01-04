@@ -20,6 +20,6 @@ REFLECTION_INTERNAL_STORAGE_LOCATION="/Users/me/reflection-workspace"
 `./reflection summon useless-project`
 * copy directory `useless-project` from external location to internal location
 
-`./reflection banish reflection-test`
+`./reflection banish useless-project`
 * copy directory `useless-project` from internal location to external location and
 trash the internal version

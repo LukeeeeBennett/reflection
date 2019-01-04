@@ -14,7 +14,7 @@ const targets = [externalTarget, internalTarget];
 if (isBanishAction) targets.reverse();
 targets[0] = path.resolve(targets[0], targetName);
 
-const rsyncStream = spawn('rsync', ['-av'].concat(targets));
+const rsyncStream = spawn('rsync', ['-av', '--progress'].concat(targets));
 rsyncStream.stdout.on('data', data => console.log('rsync', data.toString()));
 rsyncStream.stderr.on('data', data => console.log('rsync', data.toString()));
 rsyncStream.on('close', rsyncExitCode => {
