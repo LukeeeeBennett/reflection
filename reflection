@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const { spawn } = require('child_process');
+
+const { REFLECTION_EXTERNAL_STORAGE_LOCATION, REFLECTION_INTERNAL_STORAGE_LOCATION } = process.env;
+const action = process.argv[2];
+const targetName = process.argv[3];
+const isBanishAction = action === 'banish';
+
+const externalTarget = path.normalize(REFLECTION_EXTERNAL_STORAGE_LOCATION);
+const internalTarget = path.normalize(REFLECTION_INTERNAL_STORAGE_LOCATION);
+const targets = [externalTarget, internalTarget];
+if (isBanishAction) targets.reverse();
+targets[0] = path.resolve(targets[0], targetName);
+
+const rsyncStream = spawn('rsync', ['-av'].concat(targets));
+rsyncStream.stdout.on('data', data => console.log('rsync', data.toString()));
+rsyncStream.stderr.on('data', data => console.log('rsync', data.toString()));
+rsyncStream.on('close', rsyncExitCode => {
+    console.log('rsync exit code', rsyncExitCode);
+
+    const isSuccessCode = rsyncExitCode === 0;
+    if (!isSuccessCode || !isBanishAction) return;
+
+    const trashStream = spawn('trash', [targets[0]]);
+    trashStream.stdout.on('data', data => console.log('trash', data.toString()));
+    trashStream.stderr.on('data', data => console.log('trash', data.toString()));
+    trashStream.on('close', trashExitCode => console.log('trash exit code', trashExitCode));
+});
